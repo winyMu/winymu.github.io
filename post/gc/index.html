@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="author" content="">
+<meta name="description" content="三色标记，是标记清扫的优化，前者gc可以与应用程序并行处理 三色不变性： 强：黑色是对象不能引用白色对象 弱：黑色可以间接引用白色，但是中间必须有灰色对象 保证并发正确性，即不会误把运行的对象清理掉 过程： 标记准备：暂停所有P，打开写屏障 标记：恢复运行，开始三色标记 标记结束：暂停，关闭写屏障 清理：开始运行，并发清理" />
+<meta name="keywords" content=", 垃圾回收" />
+<meta name="robots" content="noodp" />
+<meta name="theme-color" content="" />
+<link rel="canonical" href="https://winymu.github.io/post/gc/" />
+
+
+    <title>
+        
+            go垃圾回收 :: My New Hugo Site 
+        
+    </title>
+
+
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/3.5.0/css/flag-icon.min.css" rel="stylesheet"
+    type="text/css">
+
+
+
+<link rel="stylesheet" href="/main.29c2c8c3fc9cf748254138351f142ac2833b208a68e83aec126edc98b59efef2.css">
+
+
+
+
+
+
+<meta itemprop="name" content="go垃圾回收">
+<meta itemprop="description" content="三色标记，是标记清扫的优化，前者gc可以与应用程序并行处理 三色不变性： 强：黑色是对象不能引用白色对象 弱：黑色可以间接引用白色，但是中间必须有灰色对象 保证并发正确性，即不会误把运行的对象清理掉 过程： 标记准备：暂停所有P，打开写屏障 标记：恢复运行，开始三色标记 标记结束：暂停，关闭写屏障 清理：开始运行，并发清理"><meta itemprop="datePublished" content="2022-05-04T22:28:15+08:00" />
+<meta itemprop="dateModified" content="2022-05-04T22:28:15+08:00" />
+<meta itemprop="wordCount" content="10"><meta itemprop="image" content="https://winymu.github.io/"/>
+<meta itemprop="keywords" content="垃圾回收," />
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://winymu.github.io/"/>
+
+<meta name="twitter:title" content="go垃圾回收"/>
+<meta name="twitter:description" content="三色标记，是标记清扫的优化，前者gc可以与应用程序并行处理 三色不变性： 强：黑色是对象不能引用白色对象 弱：黑色可以间接引用白色，但是中间必须有灰色对象 保证并发正确性，即不会误把运行的对象清理掉 过程： 标记准备：暂停所有P，打开写屏障 标记：恢复运行，开始三色标记 标记结束：暂停，关闭写屏障 清理：开始运行，并发清理"/>
+
+
+
+
+
+
+    <meta property="article:section" content="gc" />
+
+
+
+    <meta property="article:published_time" content="2022-05-04 22:28:15 &#43;0800 CST" />
+
+
+
+
+
+
+
+
+
+
+    </head>
+
+    
+        <body>
+    
+    
+        <div class="container">
+            <header class="header">
+    <span class="header__inner">
+        <a href="/" style="text-decoration: none;">
+    <div class="logo">
+        
+            <span class="logo__mark">></span>
+            <span class="logo__text">hello</span>
+            <span class="logo__cursor" style=
+                  "
+                   
+                   ">
+            </span>
+        
+    </div>
+</a>
+
+
+        <span class="header__right">
+            
+                <nav class="menu">
+    <ul class="menu__inner"><li><a href="/about/">关于</a></li><li><a href="/categories/">分类</a></li><li><a href="/post">文章</a></li><li><a href="/tags/">标签</a></li>
+    </ul>
+</nav>
+
+                <span class="menu-trigger">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                    </svg>
+                </span>
+            
+        </span>
+    </span>
+</header>
+
+
+            <div class="content">
+                
+    <main class="post">
+
+        <div class="post-info">
+            
+            </p>
+        </div>
+
+        <article>
+            <h2 class="post-title"><a href="https://winymu.github.io/post/gc/">go垃圾回收</a></h2>
+
+            
+            
+            
+
+            <div class="post-content">
+                <p>三色标记，是标记清扫的优化，前者gc可以与应用程序并行处理
+三色不变性：
+强：黑色是对象不能引用白色对象
+弱：黑色可以间接引用白色，但是中间必须有灰色对象
+<strong>保证并发正确性，即不会误把运行的对象清理掉</strong>
+过程：
+标记准备：暂停所有P，打开写屏障
+标记：恢复运行，开始三色标记
+标记结束：暂停，关闭写屏障
+清理：开始运行，并发清理</p>
+
+            </div>
+        </article>
+
+        <hr />
+
+        <div class="post-info">
+            
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-tag meta-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7" y2="7"></line></svg>
+
+        <span class="tag"><a href="https://winymu.github.io/tags/%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6/">垃圾回收</a></span>
+        
+    </p>
+
+            
+    <p>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-folder meta-icon"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+
+        <span class="tag"><a href="https://winymu.github.io/categories/gc/">gc</a></span>
+        
+    </p>
+
+  		</div>
+    </main>
+
+            </div>
+
+            
+                <footer class="footer">
+    
+    
+</footer>
+
+            
+        </div>
+
+        
+
+
+
+<script type="text/javascript" src="/bundle.min.599099f1f14b78b657d524b28e10e0c5098e7cd46e9c7aed73d577068a276c3ff1bb234cbf29cb313333e83cf411727b43157c91ce5b809e2ffc81664614608e.js" integrity="sha512-WZCZ8fFLeLZX1SSyjhDgxQmOfNRunHrtc9V3BoonbD/xuyNMvynLMTMz6Dz0EXJ7QxV8kc5bgJ4v/IFmRhRgjg=="></script>
+
+
+
+    </body>
+</html>

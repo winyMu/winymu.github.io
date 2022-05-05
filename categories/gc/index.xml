@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>gc on My New Hugo Site</title>
+    <link>https://winymu.github.io/categories/gc/</link>
+    <description>Recent content in gc on My New Hugo Site</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 04 May 2022 22:28:15 +0800</lastBuildDate><atom:link href="https://winymu.github.io/categories/gc/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>go垃圾回收</title>
+      <link>https://winymu.github.io/post/gc/</link>
+      <pubDate>Wed, 04 May 2022 22:28:15 +0800</pubDate>
+      
+      <guid>https://winymu.github.io/post/gc/</guid>
+      <description>三色标记，是标记清扫的优化，前者gc可以与应用程序并行处理 三色不变性： 强：黑色是对象不能引用白色对象 弱：黑色可以间接引用白色，但是中间必须有灰色对象 保证并发正确性，即不会误把运行的对象清理掉 过程： 标记准备：暂停所有P，打开写屏障 标记：恢复运行，开始三色标记 标记结束：暂停，关闭写屏障 清理：开始运行，并发清理</description>
+    </item>
+    
+  </channel>
+</rss>
